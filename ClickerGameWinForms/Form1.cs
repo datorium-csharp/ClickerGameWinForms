@@ -4,6 +4,7 @@ namespace ClickerGameWinForms
     {
 
         int score = 0;
+        int highScore = 0;
         int seconds = 10;
         bool gameStarted = false;
 
@@ -20,15 +21,11 @@ namespace ClickerGameWinForms
             if(gameStarted == false)
             {
                 GameTimer.Start();
+                JumpTimer.Start();
                 gameStarted = true;
-            }       
+            }
 
-            int maxTop = ClientRectangle.Height - ClickMeButton.Height;
-            int maxLeft = ClientRectangle.Width - ClickMeButton.Width;
-            
-            ClickMeButton.Top = rand.Next(0, maxTop);
-            ClickMeButton.Left = rand.Next(0, maxLeft);
-
+            RandomJump();
             score += 1;
             ClickMeButton.Text = score.ToString();
         }
@@ -39,21 +36,52 @@ namespace ClickerGameWinForms
             TimerLabel.Text = seconds.ToString();
             if(seconds == 0)
             {
-                GameTimer.Stop();
-                ClickMeButton.Enabled = false;
-                ButtonRestart.Visible = true;
+                GameOver();
             }
         }
 
         private void ButtonRestart_Click(object sender, EventArgs e)
         {
             score = 0;
-            ClickMeButton.Text = score.ToString();
-            ClickMeButton.Enabled = true;
             seconds = 10;
-            TimerLabel.Text = seconds.ToString();
             gameStarted = false;
+
+            ClickMeButton.Text = score.ToString();
+            ClickMeButton.Enabled = true;            
+            TimerLabel.Text = seconds.ToString();            
             ButtonRestart.Visible = false;
+        }
+
+        private void JumpTimer_Tick(object sender, EventArgs e)
+        {
+            RandomJump();
+        }
+
+        private void RandomJump()
+        {
+            int maxTop = ClientRectangle.Height - ClickMeButton.Height;
+            int maxLeft = ClientRectangle.Width - ClickMeButton.Width;
+
+            ClickMeButton.Top = rand.Next(0, maxTop);
+            ClickMeButton.Left = rand.Next(0, maxLeft);
+        }
+
+        private void SetHighScore()
+        {
+            if(score > highScore)
+            {
+                highScore = score;
+                MessageBox.Show("You have set a new High Score!");
+            }
+        }
+
+        private void GameOver()
+        {
+            GameTimer.Stop();
+            JumpTimer.Stop();
+            ClickMeButton.Enabled = false;
+            ButtonRestart.Visible = true;
+            SetHighScore();
         }
     }
 }
